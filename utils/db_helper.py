@@ -55,6 +55,12 @@ class DBHelper:
             counter += 1
         return data_text
 
+    def SelectDataById(self,tableName,id):
+        sql = f"select * from {tableName} where id={id}"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        return data
+
     def TruncateTable(self,tableName):
         sql = f"TRUNCATE TABLE {tableName}"
         self.cursor.execute(sql)
