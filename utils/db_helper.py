@@ -1,9 +1,10 @@
 import pymysql
 from config import DBSetting
 
+
 class DBHelper:
-    def __init__(self,host,user,password,db,port):
-        self.conn = pymysql.connect(host=host, user=user, password=password,port=port)
+    def __init__(self, host, user, password, db, port):
+        self.conn = pymysql.connect(host=host, user=user, password=password, port=port)
         self.cursor = self.conn.cursor()
         self.db = db
 
@@ -36,11 +37,11 @@ class DBHelper:
         except:
             print("id already exist")
 
-    def UpdateData(self,str,id):
+    def UpdateData(self, str, id: int):
         sql = f"UPDATE report set content = '{str}' where id = '{id}'"
         self.cursor.execute(sql)
 
-    def DeleteData(self,id):
+    def DeleteData(self, id: int):
         sql = f"delete from report where id = {id}"
         self.cursor.execute(sql)
 
@@ -55,17 +56,17 @@ class DBHelper:
             counter += 1
         return data_text
 
-    def SelectDataById(self,tableName,id):
+    def SelectDataById(self, tableName, id):
         sql = f"select * from {tableName} where id={id}"
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         return data
 
-    def TruncateTable(self,tableName):
+    def TruncateTable(self, tableName):
         sql = f"TRUNCATE TABLE {tableName}"
         self.cursor.execute(sql)
 
-    def CreatTable(self,tableName):
+    def CreatTable(self, tableName):
         sql = "show tables;"
         self.cursor.execute(sql)
         tables = self.cursor.fetchall()
@@ -80,7 +81,7 @@ class DBHelper:
         else:
             print(f"Table Name '{tableName}' already exist")
 
-    def DropTable(self,tableName):
+    def DropTable(self, tableName):
         sql = f"DROP TABLE {tableName};"
         try:
             self.cursor.execute(sql)

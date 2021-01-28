@@ -14,7 +14,7 @@ if __name__ == '__main__':
         # db_helper.UpdateData("666",2)
         # db_helper.DeleteData(2)
         # print(db_helper.SelectData(1000))
-        # print(db_helper.SelectDataById("report",100))
+        print(db_helper.SelectDataById("report", 99))
         # db_helper.TruncateTable("report")
 
         # db_helper.DropTable("report")
