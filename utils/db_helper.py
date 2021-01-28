@@ -3,14 +3,31 @@ from config import DBSetting
 
 class DBHelper:
     def __init__(self,host,user,password,db,port):
-        self.conn = pymysql.connect(host=host, user=user, password=password, db=db, port=port)
+        self.conn = pymysql.connect(host=host, user=user, password=password,port=port)
         self.cursor = self.conn.cursor()
+        self.db = db
+
+    def __enter__(self):
+        sql = "show databases"
+        self.cursor.execute(sql)
+        databases = self.cursor.fetchall()
+        databases_exist = 0
+        for database in databases:
+            if database[0] == self.db:
+                databases_exist = 1
+        if databases_exist == 0:
+            print(f"{self.db} does not exist!")
+
+        else:
+            print(f"Using database {self.db}")
+            sql = f"use {self.db}"
+            self.cursor.execute(sql)
+            return self
 
     def InserCSVData(self, data, num_of_data: int):
         for i in range(num_of_data):
             sql = f"INSERT INTO report VALUES('{data[i]}','','','{i + 1}')"
             self.cursor.execute(sql)
-        self.conn.commit()
 
     def InsertData(self, str, id: int):
         sql = f"INSERT INTO report VALUES('{str}','','','{id}')"
@@ -18,17 +35,14 @@ class DBHelper:
             self.cursor.execute(sql)
         except:
             print("id already exist")
-        self.conn.commit()
 
     def UpdateData(self,str,id):
         sql = f"UPDATE report set content = '{str}' where id = '{id}'"
         self.cursor.execute(sql)
-        self.conn.commit()
 
     def DeleteData(self,id):
         sql = f"delete from report where id = {id}"
         self.cursor.execute(sql)
-        self.conn.commit()
 
     def SelectData(self, num_of_data: int):
         sql = f"select * from report limit {num_of_data}"
@@ -41,25 +55,33 @@ class DBHelper:
             counter += 1
         return data_text
 
-    def TruncateTable(self):
-        sql = "TRUNCATE TABLE report"
+    def TruncateTable(self,tableName):
+        sql = f"TRUNCATE TABLE {tableName}"
         self.cursor.execute(sql)
-        self.conn.commit()
 
     def CreatTable(self,tableName):
         sql = "show tables;"
         self.cursor.execute(sql)
         tables = self.cursor.fetchall()
+        table_exist = 0
         for table in tables:
-            print(table[0])
-        sql = f"CREATE TABLE {tableName}(id int,content varchar(100),label varchar(10));"
-        self.cursor.execute(sql)
-        self.conn.commit()
+            if table[0] == tableName:
+                table_exist = 1
+        if table_exist == 0:
+            sql = f"CREATE TABLE {tableName}(content varchar(10000),label varchar(100),other varchar(100),id int,PRIMARY KEY (id));"
+            self.cursor.execute(sql)
+
+        else:
+            print(f"Table Name '{tableName}' already exist")
 
     def DropTable(self,tableName):
         sql = f"DROP TABLE {tableName};"
-        self.cursor.execute(sql)
-        self.conn.commit()
+        try:
+            self.cursor.execute(sql)
+        except Exception:
+            print(f"Can't find out the table {tableName}")
 
-    def ConnClose(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.conn.commit()
         self.conn.close()
+        print("close....")
