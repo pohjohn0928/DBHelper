@@ -10,7 +10,8 @@ class DataHelper:
         rows = csv.reader(f)
         for row in rows:
             news = row[0].replace("'", "\\'")  # 跳脫字元
-            raw_data.append(news)
+            if len(news) < 10000:
+                raw_data.append(news)
         f.close()
         random.shuffle(raw_data)
         return raw_data

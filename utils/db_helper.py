@@ -1,5 +1,5 @@
 import pymysql
-from config import DBSetting
+import logging
 
 
 class DBHelper:
@@ -7,6 +7,9 @@ class DBHelper:
         self.conn = pymysql.connect(host=host, user=user, password=password, port=port)
         self.cursor = self.conn.cursor()
         self.db = db
+        FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+        DATE_FORMAT = '%Y%m%d %H:%M:%S'
+        logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='db.log', filemode='w')
 
     def __enter__(self):
         sql = "show databases"
@@ -17,25 +20,25 @@ class DBHelper:
             if database[0] == self.db:
                 databases_exist = 1
         if databases_exist == 0:
-            print(f"{self.db} does not exist!")
+            logging.error(f"{self.db} does not exist!")
 
         else:
-            print(f"Using database {self.db}")
+            logging.debug(f"Using database {self.db}")
             sql = f"use {self.db}"
             self.cursor.execute(sql)
             return self
 
     def InserCSVData(self, data, num_of_data: int):
         for i in range(num_of_data):
-            sql = f"INSERT INTO report VALUES('{data[i]}','','','{i + 1}')"
+            sql = f"INSERT INTO report VALUES('{data[i]}','','','{i + 1}','{int(i / 200) + 1}')"
             self.cursor.execute(sql)
 
-    def InsertData(self, str, id: int):
-        sql = f"INSERT INTO report VALUES('{str}','','','{id}')"
+    def InsertData(self, str, id: int, taskId: int):
+        sql = f"INSERT INTO report VALUES('{str}','','','{id}','{taskId}')"
         try:
             self.cursor.execute(sql)
         except:
-            print("id already exist")
+            logging.warning(f"id : {id} already exist")
 
     def UpdateData(self, str, id: int):
         sql = f"UPDATE report set content = '{str}' where id = '{id}'"
@@ -62,6 +65,12 @@ class DBHelper:
         data = self.cursor.fetchall()
         return data
 
+    def SelectDataByTask(self, tableName, taskNum: int):
+        sql = f"select * from {tableName} where taskId={taskNum}"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        return data
+
     def TruncateTable(self, tableName):
         sql = f"TRUNCATE TABLE {tableName}"
         self.cursor.execute(sql)
@@ -75,20 +84,45 @@ class DBHelper:
             if table[0] == tableName:
                 table_exist = 1
         if table_exist == 0:
-            sql = f"CREATE TABLE {tableName}(content varchar(10000),label varchar(100),other varchar(100),id int,PRIMARY KEY (id));"
+            sql = f"CREATE TABLE {tableName}(content varchar(10000),label varchar(100),other varchar(100),id int,taskId int,PRIMARY KEY (id));"
             self.cursor.execute(sql)
 
         else:
-            print(f"Table Name '{tableName}' already exist")
+            logging.error(f"Table Name '{tableName}' already exist")
 
     def DropTable(self, tableName):
         sql = f"DROP TABLE {tableName};"
         try:
             self.cursor.execute(sql)
         except Exception:
-            print(f"Can't find out the table {tableName}")
+            logging.error(f"Can't find out the table {tableName}")
+
+
+    def CreateDocTable(self, tableName):
+        sql = "show tables;"
+        self.cursor.execute(sql)
+        tables = self.cursor.fetchall()
+        table_exist = 0
+        for table in tables:
+            if table[0] == tableName:
+                table_exist = 1
+        if table_exist == 0:
+            sql = f"CREATE TABLE {tableName}(doc_id int,content varchar(10000),task_id int,label varchar(100),PRIMARY KEY (doc_id));"
+            self.cursor.execute(sql)
+        else:
+            logging.error(f"Table Name '{tableName}' already exist")
+
+    def InsertCSVDataToDoc(self,data,num_of_data: int):
+        for i in range(num_of_data):
+            sql = f"INSERT INTO documents VALUES('{i + 1}','{data[i]}','{int(i / 200) + 1}','')"
+            self.cursor.execute(sql)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()
         self.conn.close()
-        print("close....")
+        logging.debug("Database closed..")
+
+    def test(self,a):
+        b = a
+        print(b)
+        return b;
