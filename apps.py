@@ -7,7 +7,7 @@ app = Flask(__name__)
                                     # name = request.values['name']
 @app.route('/')
 def home_page():
-    return render_template("index.html",title = "tasks")
+    return render_template("index.html",title = "DB")
 
 @app.route('/insert',methods = ["POST"])
 def insert():
@@ -16,7 +16,9 @@ def insert():
     taskId = request.values['taskId']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        return f'<script>alert("{db_helper.InsertData(content,id,taskId)}")</script>'
+        result = db_helper.InsertData(content,id,taskId)
+        return result
+
 
 @app.route('/update',methods = ["POST"])
 def update():
@@ -24,14 +26,16 @@ def update():
     content = request.values['content']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        return f'<script>alert("{db_helper.UpdateData(content,id)}")</script>'
+        result = db_helper.UpdateData(content,id)
+        return result
 
 @app.route('/delete',methods = ["POST"])
 def idDelete():
     id = request.values['id']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        return f'<script>alert("{db_helper.DeleteData(id)}")</script>'
+        result = db_helper.DeleteData(id)
+        return result
 
 @app.route('/searchByTask',methods = ["POST"])
 def task():
@@ -39,7 +43,16 @@ def task():
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
         news = db_helper.SelectDataByTask('report',int(taskNum))
-    return render_template("task.html",news = news,db_helper = db_helper)
+        result = {
+            "id" : [],
+            "content" : [],
+            "task_id" : []
+        }
+        for new in news:
+            result["id"].append(new[3])
+            result["content"].append(new[0])
+            result["task_id"].append(new[4])
+    return result
 
 @app.route('/searchById',methods = ["POST"])
 def id():
@@ -47,7 +60,16 @@ def id():
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
         news = db_helper.SelectDataById('report', id)
-    return render_template("id.html",news = news)
+    if news == ():
+        return "false"
+    else:
+        result = {
+            "id" : news[0][3],
+            "content" : news[0][0],
+            "task_id" : news[0][4]
+        }
+        return result
+
 
 if __name__ == '__main__':
     app.run(debug=True)

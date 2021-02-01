@@ -9,7 +9,7 @@ class DBHelper:
         self.db = db
         FORMAT = '%(asctime)s %(levelname)s: %(message)s'
         DATE_FORMAT = '%Y%m%d %H:%M:%S'
-        logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='db.log', filemode='w')
+        logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='log\\db.log', filemode='a')
 
     def __enter__(self):
         sql = "show databases"

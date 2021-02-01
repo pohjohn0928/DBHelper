@@ -1,50 +1,191 @@
 <html>
     <title>{{title}}</title>
     <head>
-        <script src = "jquery.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     </head>
+    <style>
+        input{
+            font-size:10px;
+            width : 100px;
+        }
+
+    </style>
+    <script>
+        function InsertFunc(){
+            var aj = $.ajax({
+                url : '/insert',
+                data :
+                {
+                    id : $('#SelectId').val(),
+                    content : $('#SelectContent').val(),
+                    taskId : $('#SelectTaskId').val()
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+             })
+        }
+
+        function UpdateFunc(){
+            var aj = $.ajax({
+                url : '/update',
+                data :
+                {
+                    id : $('#UpdateId').val(),
+                    content : $('#UpdateContent').val(),
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+             })
+        }
+
+        function DeleteFunc(i){
+            console.log(i);
+            var className = `deleteBtn${i}`;
+            console.log(className);
+            var aj = $.ajax({
+                url : '/delete',
+                data :
+                {
+                    id : $(`.${className}`).val(),
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+             })
+        }
+
+        function SelectTaskFunc(){
+            var aj = $.ajax({
+                url : '/searchByTask',
+                data :
+                {
+                    task : $('#SelectTask').val(),
+                },
+                type : 'post',
+                success : function (result) {
+                    displayTaskIdNews(result)
+                }
+             })
+        }
+
+
+
+        function displayTaskIdNews(news){
+            var content = `<table class="table table-success table-striped">`;
+            content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td>`;
+            var len = news["id"].length;
+            for(var i = 0 ; i < len ; i++){
+                    content += `<tr></tr><td>${news["id"][i]}</td><td>${news["content"][i]}</td><td>${news["task_id"][i]}</td><td><button class="deleteBtn${i}" onclick="DeleteFunc(${i})" value="${news["id"][i]}">delete</button></td>`;
+            }
+            content += `</table>`
+            document.getElementById("showInfo").innerHTML = content
+        }
+
+        function SelectIdFunc(){
+            var aj = $.ajax({
+                url : '/searchById',
+                data :
+                {
+                    id : $('#SelectById').val(),
+                },
+                type : 'post',
+                success : function (result) {
+                    if(result == "false"){
+                        alert("id does not exist!")
+                    }
+                    else{
+                        displayIdNews(result);
+                    }
+                }
+             })
+        }
+
+        function displayIdNews(news){
+            var i = 0;
+            content = `<table class="table table-success table-striped">`;
+            content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td>`;
+            content +=`<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i}" onclick="DeleteFunc(${i})" value="${news["id"]}">delete</button></td>`;
+            content += `</table>`;
+            document.getElementById("showInfo").innerHTML = content;
+        }
+
+    </script>
     <body>
-        <h1>Insert : </h1>
-        <form method="post" action = "/insert">
-            Insert id : <input type="text" name="id"/><br>
-            Insert content :
-            <div class="form-group">
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content"></textarea>
-            </div><br>
-            Insert task id<input type="text" name="taskId"/>
-            <input type="submit"/>
-        </form>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-4" style="background-color:lavender;">
+                    <div class="row">
+                        <h4>Insert : </h4>
+                        <div class="form-group">
+                        <div class="col-sm-4" style="background-color:lavender;">Insert id : <input type="text" id="SelectId"/></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3" style="background-color:lavender;">
+                                Insert content :
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="3" id="SelectContent"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3" style="background-color:lavender;">Insert task id : <input type="text" id="SelectTaskId"/></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2" style="background-color:lavender;"><button onclick="InsertFunc()">submit</button></div>
+                        </div>
+                    </div>  <!--Insert-->
+                    <hr/>
+                    <div class="row">
+                        <h4>Update : </h4>
+                        <div class="form-group">
+                            <div class="col-sm-4" style="background-color:lavender;">update id : <input type="text" id="UpdateId"/></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4" style="background-color:lavender;">
+                                update content :
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="3" id="UpdateContent"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4" style="background-color:lavender;"><button onclick="UpdateFunc()">submit</button></div>
+                        </div>
+                    </div>   <!--Update-->
 
-        <h1>Update : </h1>
-        <form method="post" action = "/update">
-            update id : <input type="text" name="id"/><br>
-            update content :
-            <div class="form-group">
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content"></textarea>
+                    <hr/>
+                    <div class="row">
+                        <h4>Select : </h4>
+                        <div class="form-group">
+                            <div class="col-sm-6" style="background-color:lavender;">
+                                <select id="SelectTask">
+                                    <option value="1">task1</option>
+                                    <option value="2">task2</option>
+                                    <option value="3">task3</option>
+                                    <option value="4">task4</option>
+                                    <option value="5">task5</option>
+                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6" style="background-color:lavender;"><button onclick="SelectTaskFunc()">submit</button></div>
+                        </div>
+                    </div>  <!--Select-->
+                    <hr/>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-6" style="background-color:lavender;">Select by id : <input type="text" id="SelectById"/></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6" style="background-color:lavender;"><button onclick="SelectIdFunc()">submit</button></div>
+                        </div>
+                    </div>  <!--Select-->
+                </div>
+                <div class="col-sm-8" style="background-color:white;">
+                    <div id="showInfo"></div>
+                </div>
             </div>
-            <input type="submit"/>
-        </form>
-
-        <h1>Delete : </h1>
-        <form method="post" action = "/delete">
-            delete by id : <input type="text" name="id"/>
-            <input type="submit"/>
-        </form>
-
-        <h1>Select : </h1>
-        <form method="post" action = "/searchByTask">
-            <select name="task">
-                <option value="1">task1</option>
-                <option value="2">task2</option>
-                <option value="3">task3</option>
-                <option value="4">task4</option>
-                <option value="5">task5</option>
-            </select>
-            <input type="submit"/>
-        </form>
-        <form method="post" action = "/searchById">
-            Select by id : <input type="text" name="id"/>
-            <input type="submit"/>
-        </form>
+        </div>
    </body>
 </html>
