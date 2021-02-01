@@ -3,8 +3,8 @@ import logging
 
 
 class DBHelper:
-    def __init__(self, host, user, password, db, port):
-        self.conn = pymysql.connect(host=host, user=user, password=password, port=port)
+    def __init__(self, host, user, password, db):
+        self.conn = pymysql.connect(host=host, user=user, password=password)
         self.cursor = self.conn.cursor()
         self.db = db
         FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -34,19 +34,34 @@ class DBHelper:
             self.cursor.execute(sql)
 
     def InsertData(self, str, id: int, taskId: int):
-        sql = f"INSERT INTO report VALUES('{str}','','','{id}','{taskId}')"
-        try:
+        checkSql = f"select * from report where id={id}"
+        self.cursor.execute(checkSql)
+        if self.cursor.fetchall() == ():
+            sql = f"INSERT INTO report VALUES('{str}','','','{id}','{taskId}')"
             self.cursor.execute(sql)
-        except:
-            logging.warning(f"id : {id} already exist")
+            return f"{str} is inserted to report with id : {id} and task id : {taskId}"
+        else:
+            return "Id already exist!"
 
     def UpdateData(self, str, id: int):
-        sql = f"UPDATE report set content = '{str}' where id = '{id}'"
-        self.cursor.execute(sql)
+        checkSql = f"select * from report where id={id}"
+        self.cursor.execute(checkSql)
+        if self.cursor.fetchall() != ():
+            sql = f"UPDATE report set content = '{str}' where id = '{id}'"
+            self.cursor.execute(sql)
+            return f"id : {id} is updated with content : {str}"
+        else:
+            return f"Id : {id} dose not exist yet"
 
     def DeleteData(self, id: int):
-        sql = f"delete from report where id = {id}"
-        self.cursor.execute(sql)
+        checkSql = f"select * from report where id={id}"
+        self.cursor.execute(checkSql)
+        if self.cursor.fetchall() != ():
+            sql = f"delete from report where id = {id}"
+            self.cursor.execute(sql)
+            return f"id : {id} is deleted"
+        else:
+            return f"{id} dose not exist yet"
 
     def SelectData(self, num_of_data: int):
         sql = f"select * from report limit {num_of_data}"
@@ -121,8 +136,3 @@ class DBHelper:
         self.conn.commit()
         self.conn.close()
         logging.debug("Database closed..")
-
-    def test(self,a):
-        b = a
-        print(b)
-        return b;

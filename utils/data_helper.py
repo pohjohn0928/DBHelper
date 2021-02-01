@@ -4,7 +4,7 @@ import random
 
 class DataHelper:
     def getCleanCSVData(self):
-        path = "C:\\Users\\taisiangbo\\Desktop\\20200706_rowdata.csv"
+        path = "C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\20200706_rowdata.csv"
         raw_data = []
         f = open(path, encoding='utf-8')
         rows = csv.reader(f)

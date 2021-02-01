@@ -4,7 +4,35 @@
         <script src = "jquery.js"></script>
     </head>
     <body>
-        <form method="post" action = "/task">
+        <h1>Insert : </h1>
+        <form method="post" action = "/insert">
+            Insert id : <input type="text" name="id"/><br>
+            Insert content :
+            <div class="form-group">
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content"></textarea>
+            </div><br>
+            Insert task id<input type="text" name="taskId"/>
+            <input type="submit"/>
+        </form>
+
+        <h1>Update : </h1>
+        <form method="post" action = "/update">
+            update id : <input type="text" name="id"/><br>
+            update content :
+            <div class="form-group">
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content"></textarea>
+            </div>
+            <input type="submit"/>
+        </form>
+
+        <h1>Delete : </h1>
+        <form method="post" action = "/delete">
+            delete by id : <input type="text" name="id"/>
+            <input type="submit"/>
+        </form>
+
+        <h1>Select : </h1>
+        <form method="post" action = "/searchByTask">
             <select name="task">
                 <option value="1">task1</option>
                 <option value="2">task2</option>
@@ -12,6 +40,10 @@
                 <option value="4">task4</option>
                 <option value="5">task5</option>
             </select>
+            <input type="submit"/>
+        </form>
+        <form method="post" action = "/searchById">
+            Select by id : <input type="text" name="id"/>
             <input type="submit"/>
         </form>
    </body>

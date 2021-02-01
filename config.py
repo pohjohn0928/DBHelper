@@ -5,4 +5,3 @@ class DBSetting(object):
         self.user = "root"
         self.password = "pohjohn88990928"
         self.db = "news"
-        self.port = 3306

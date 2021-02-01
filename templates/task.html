@@ -7,8 +7,8 @@
     <title>Title</title>
     <script>
         function DeleteEvent(id){
-            document.getElementById("test").innerHTML += "delete id " + id + "<br>";
-            document.getElementById("test2").innerHTML = {{db_helper.test(5)}}
+
+            document.getElementById("test").innerHTML = "Want to delete " + id +';
         }
     </script>
 </head>
@@ -18,16 +18,12 @@
             <td>Id</td>
             <td>Content</td>
             <td>Task Id</td>
-            <td>Edit</td>
         {% for new in news %}
         <tr></tr>
             <td>{{new[3]}}</td>
             <td>{{new[0]}}</td>
             <td>{{new[4]}}</td>
-            <td><button onclick="DeleteEvent({{new[3]}})">Delete</button></td>
         {% endfor %}
     </table>
-    <div id="test"></div>
-    <div id="test2"></div>
 </body>
 </html>
