@@ -80,8 +80,8 @@ class DBHelper:
         data = self.cursor.fetchall()
         return data
 
-    def SelectDataByTask(self, tableName, taskNum: int):
-        sql = f"select * from {tableName} where taskId={taskNum}"
+    def SelectDataByTask(self, tableName, taskId: int):
+        sql = f"select * from {tableName} where taskId={taskId}"
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         return data
