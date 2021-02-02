@@ -24,9 +24,10 @@ def insert():
 def update():
     id = request.values['id']
     content = request.values['content']
+    task_id = request.values['task_id']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        result = db_helper.UpdateData(content,id)
+        result = db_helper.UpdateData(content,id,task_id)
         return result
 
 @app.route('/delete',methods = ["POST"])

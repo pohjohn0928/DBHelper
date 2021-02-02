@@ -9,7 +9,7 @@ class DBHelper:
         self.db = db
         FORMAT = '%(asctime)s %(levelname)s: %(message)s'
         DATE_FORMAT = '%Y%m%d %H:%M:%S'
-        logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='log\\db.log', filemode='a')
+        logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\log\\db.log', filemode='a')
 
     def __enter__(self):
         sql = "show databases"
@@ -43,11 +43,11 @@ class DBHelper:
         else:
             return "Id already exist!"
 
-    def UpdateData(self, str, id: int):
+    def UpdateData(self, str, id: int,taskId:int):
         checkSql = f"select * from report where id={id}"
         self.cursor.execute(checkSql)
         if self.cursor.fetchall() != ():
-            sql = f"UPDATE report set content = '{str}' where id = '{id}'"
+            sql = f"UPDATE report set content = '{str}', taskId = '{taskId}' where id = '{id}'"
             self.cursor.execute(sql)
             return f"id : {id} is updated with content : {str}"
         else:
