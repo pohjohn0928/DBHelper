@@ -1,6 +1,6 @@
 import pymysql
 import logging
-
+from datetime import datetime
 
 class DBHelper:
     def __init__(self, host, user, password, db):
@@ -33,15 +33,10 @@ class DBHelper:
             sql = f"INSERT INTO report VALUES('{data[i]}','','','{i + 1}','{int(i / 200) + 1}')"
             self.cursor.execute(sql)
 
-    def InsertData(self, str, id: int, taskId: int):
-        checkSql = f"select * from report where id={id}"
-        self.cursor.execute(checkSql)
-        if self.cursor.fetchall() == ():
-            sql = f"INSERT INTO report VALUES('{str}','','','{id}','{taskId}')"
-            self.cursor.execute(sql)
-            return f"{str} is inserted to report with id : {id} and task id : {taskId}"
-        else:
-            return "Id already exist!"
+    def InsertData(self, str, taskId: int):
+        sql = f"INSERT INTO report (content,label,other,taskId) VALUES('{str}','','','{taskId}')"
+        self.cursor.execute(sql)
+        return f"{str} is inserted to report with task id : {taskId}"
 
     def UpdateData(self, str, id: int,taskId:int):
         checkSql = f"select * from report where id={id}"
@@ -131,6 +126,62 @@ class DBHelper:
         for i in range(num_of_data):
             sql = f"INSERT INTO documents VALUES('{i + 1}','{data[i]}','{int(i / 200) + 1}','')"
             self.cursor.execute(sql)
+
+
+
+    #Task table
+    def CreatTaskTable(self,tableName):
+        sql = "show tables;"
+        self.cursor.execute(sql)
+        tables = self.cursor.fetchall()
+        table_exist = 0
+        for table in tables:
+            if table[0] == tableName:
+                table_exist = 1
+        if table_exist == 0:
+            sql = f"CREATE TABLE {tableName}(id int AUTO_INCREMENT,name varchar(100),description varchar(20000),create_time varchar(100),Update_time varchar(100),PRIMARY KEY (id));"
+            self.cursor.execute(sql)
+        else:
+            logging.error(f"Table Name '{tableName}' already exist")
+
+    def InitTaskTable(self):
+        sql = "SELECT * FROM report GROUP BY taskId HAVING count(*)>1"
+        self.cursor.execute(sql)
+        for data in self.cursor.fetchall():
+            self.InsertToTaskTable(f"task{data[4]}",f"This is task{data[4]}")
+        return "Finish Initialize"
+
+    def GetTaskTableInfo(self):
+        sql = f"select * from task where 1"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        return data
+
+    def InsertToTaskTable(self,name,description):
+        now = datetime.now()
+        current_time = now.strftime("%d/%m/%Y %H:%M:%S")
+        sql = f"INSERT INTO task (name,description,create_time,Update_time) VALUES('{name}','{description}','{current_time}','{current_time}')"
+        self.cursor.execute(sql)
+        return "Finish Insert"
+
+    def UpdateTaskTable(self,id:int,name,description):
+        now = datetime.now()
+        current_time = now.strftime("%d/%m/%Y %H:%M:%S")
+        sql = f"UPDATE task set name = '{name}', description = '{description}', Update_time ='{current_time}' where id = '{id}'"
+        self.cursor.execute(sql)
+        return f"id : {id} is updated name : '{name}' and description : '{description}'"
+
+    def DeleteTaskData(self,id: int):
+        checkSql = f"select * from task where id={id}"
+        self.cursor.execute(checkSql)
+        if self.cursor.fetchall() != ():
+            sql = f"delete from task where id = {id}"
+            self.cursor.execute(sql)
+            return f"id : {id} is deleted"
+        else:
+            return f"{id} dose not exist yet"
+
+
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()

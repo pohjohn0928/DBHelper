@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script>
+
+    var global_id = 0;
+    $(document).ready(function() {
+        $.ajax({
+            type: "POST",
+            data:{},
+            url: '/showTaskTable',
+            success: function(data) {
+                showTaskTable(data);
+            }
+        })
+    });
+
+    function showTaskTable(data){
+        len = data["id"].length;
+        content = `<table class="table table-striped"><thead><tr><th>id</th><th>name</th><th>description</th><th>create_time</th><th>update_time</th><th>更新</th><th>刪除</th></tr></thead><tbody>`;
+        for(var i = 0 ; i < len ; i++){
+            content += `<tr>`;
+            content += `<th>${data["id"][i]}</th>`;
+            content += `<td><a href = "\\tables?${data["id"][i]}">${data["name"][i]}</button></a>`;
+            content += `<td>${data["description"][i]}</td>`;
+            content += `<td>${data["create_time"][i]}</td>`;
+            content += `<td>${data["Update_time"][i]}</td>`;
+            content += `<td><button class="btn btn-success" data-toggle="modal" data-target="#update" onclick="setGlobalId(${data["id"][i]})">Update</button></td>`;
+            content += `<td><button class="btn btn-danger delete_btn btn-sm deleteBtn${i}" onclick="DeleteTaskData(${i})" value="${data["id"][i]}">Delete</button></td>`;
+            content += `</tr>`;
+        }
+        content += `</tbody></table>`;
+        document.getElementById("showTaskTable").innerHTML = content;
+    }
+
+    function setGlobalId(id){
+        global_id = id;
+    }
+
+    function updateTaskTable(){
+        id = global_id;
+        name = document.getElementById("UpdateName").value;
+        description = document.getElementById("UpateDes").value;
+        var check =  confirm(`Are you sure to update the task?`);
+        if(check){
+            var aj = $.ajax({
+                url : '/upateTaskTable',
+                data :
+                {
+                    id : id,
+                    name : name,
+                    description : description
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+            })
+        }
+    }
+
+    function DeleteTaskData(i){
+        var className = `deleteBtn${i}`;
+        var check =  confirm(`Are you sure to delete the row you selected?`);
+        if(check){
+            var aj = $.ajax({
+                url : '/deleteTaskData',
+                data :
+                {
+                    id : $(`.${className}`).val(),
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+            })
+        }
+    }
+
+    function insertTaskTable(){
+        var aj = $.ajax({
+            url : '/insertTaskData',
+            data :
+            {
+                name : $('#InserName').val(),
+                description : $('#InsertDes').val()
+            },
+            type : 'post',
+            success : function (result) { alert(result); }
+         })
+    }
+
+
+
+
+</script>
+<body>
+
+<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#insert">新增資料</button>
+<div id="showTaskTable"></div>
+<div class="container">
+    <div class="modal fade" id="insert" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">新增資訊</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="InserName">name :</label>
+                            <textarea class="form-control" rows="3" id="InserName"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="InsertDes">description :</label>
+                            <input type="text" id="InsertDes"/>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" onclick="insertTaskTable()">submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="update" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">更新資訊</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="UpateName">Name :</label>
+                            <textarea class="form-control" rows="3" id="UpdateName"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="UpateDes">description :</label>
+                            <textarea class="form-control" rows="3" id="UpateDes"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" onclick="updateTaskTable()">submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

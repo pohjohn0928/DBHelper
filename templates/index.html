@@ -20,14 +20,32 @@
 </style>
 <script>
         var global_id=0;
+        url = window.location.href;
+        taskNum = url.split("?")[1];
+        console.log(taskNum);
+
+        var aj = $.ajax({
+            url : '/searchByTask',
+            data :
+            {
+                task : taskNum,
+            },
+            type : 'post',
+            success : function (result) {
+                displayTaskIdNews(result)
+            }
+         })
+
+
+
+
         function InsertFunc(){
             var aj = $.ajax({
                 url : '/insert',
                 data :
                 {
-                    id : $('#SelectId').val(),
                     content : $('#SelectContent').val(),
-                    taskId : $('#SelectTaskId').val()
+                    taskId : taskNum
                 },
                 type : 'post',
                 success : function (result) { alert(result); }
@@ -37,11 +55,7 @@
         function UpdateFunc(){
             id = global_id;
             content = document.getElementById("updateContent").value;
-            task_id = document.getElementById("updateTaskId").value;
             var check =  confirm(`Are you sure to update the content?`);
-            console.log(id);
-            console.log(content);
-            console.log(task_id);
 
             if(check){
                 var aj = $.ajax({
@@ -50,7 +64,7 @@
                     {
                         id : id,
                         content : content,
-                        task_id : task_id
+                        task_id : taskNum
                     },
                     type : 'post',
                     success : function (result) { alert(result); }
@@ -90,14 +104,18 @@
 
 
         function displayTaskIdNews(news){
-            var content = `<table class="table table-bordered table-success table-striped">`;
-            content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td><td>Update</td>`;
+            var content = `<table class="table table-striped"><thead><tr><th>id</th><th>content</th><th>Task Id</th><th>更新</th><th>刪除</th></tr></thead><tbody>`;
             var len = news["id"].length;
             for(var i = 0 ; i < len ; i++){
-                content += `<tr></tr><td>${news["id"][i]}</td><td>${news["content"][i]}</td><td>${news["task_id"][i]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"][i]}">delete</button></td>`;
+                content += `<tr>`;
+                content += `<th>${news["id"][i]}</th>`;
+                content += `<td>${news["content"][i]}</td>`;
+                content += `<td>${news["task_id"][i]}</td>`;
+                content += `<td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"][i]}">delete</button></td>`;
                 content += `<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"][i]})">更新資料</button></td>`;
+                content += `</tr>`;
             }
-            content += `</table>`
+            content += `</tbody></table>`;
             document.getElementById("showInfo").innerHTML = content;
         }
 
@@ -126,7 +144,7 @@
 
         function displayIdNews(news){
             var i = 0;
-            content =  `<table class="table table-success table-striped">`;
+            content =  `<table class="table table-striped">`;
             content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td><td>Update</td>`;
             content += `<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"]}">delete</button></td>`;
             content += `<td><button type="button" class="btn btn-primary get_id" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"]})">更新資料</button></td>`;
@@ -134,33 +152,11 @@
             document.getElementById("showInfo").innerHTML = content;
         }
 
-
-
-
-
-
 </script>
 <body>
 <div class="container-fluid">
-    <font size="5" color="red">For report table : </font>
     <div class="row">
-        <div class="col-sm-4" style="background-color:lavender;">
-            <div class="row">
-                <h5>Select : </h5>
-                <div class="form-group">
-                    <label for="SelectTask">Task id :</label>
-                    <select id="SelectTask">
-                        <option value="1">task1</option>
-                        <option value="2">task2</option>
-                        <option value="3">task3</option>
-                        <option value="4">task4</option>
-                        <option value="5">task5</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary" onclick="SelectTaskFunc()">submit</button>
-                </div>
-            </div>  <!--Select-->
-            <hr/>
-
+        <div class="col-sm-2" style="background-color:white;">
             <div class="row">
                 <div class="form-group">
                     <label for="SelectById">Select by id : </label>
@@ -170,7 +166,7 @@
             </div>
         </div>
 
-        <div class="col-sm-8" style="background-color:white;">
+        <div class="col-sm-10" style="background-color:white;">
             <!--        modal-->
             <div class="container">
                 <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#insert">新增資料</button>
@@ -183,17 +179,8 @@
                             <div class="modal-body">
                                 <form>
                                     <div class="form-group">
-                                        <label for="SelectId">Insert id :</label>
-                                        <input type="text" class="form-control" id="SelectId"
-                                               aria-describedby="emailHelp"/>
-                                    </div>
-                                    <div class="form-group">
                                         <label for="SelectContent">Insert content :</label>
                                         <textarea class="form-control" rows="3" id="SelectContent"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="SelectTaskId">Insert task id :</label>
-                                        <input type="text" id="SelectTaskId"/>
                                     </div>
                                 </form>
                             </div>
@@ -214,12 +201,8 @@
                             <div class="modal-body">
                                 <form>
                                     <div class="form-group">
-                                        <label for="SelectContent">content :</label>
+                                            <label for="SelectContent">content :</label>
                                         <textarea class="form-control" rows="3" id="updateContent"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="SelectTaskId">task id :</label>
-                                        <input type="text" id="updateTaskId"/>
                                     </div>
                                 </form>
                             </div>
