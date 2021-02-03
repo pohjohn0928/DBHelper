@@ -17,6 +17,7 @@ def showTaskTable():
         result = {
             "id": [],
             "name": [],
+            "tags" : [],
             "description": [],
             "create_time": [],
             "Update_time": []
@@ -24,9 +25,10 @@ def showTaskTable():
         for info in taskInfo:
             result["id"].append(info[0])
             result["name"].append(info[1])
-            result["description"].append(info[2])
-            result["create_time"].append(info[3])
-            result["Update_time"].append(info[4])
+            result["tags"].append(info[2])
+            result["description"].append(info[3])
+            result["create_time"].append(info[4])
+            result["Update_time"].append(info[5])
     return result
 
 
@@ -78,12 +80,14 @@ def task():
         result = {
             "id" : [],
             "content" : [],
-            "task_id" : []
+            "task_id" : [],
+            "label" : []
         }
         for new in news:
             result["id"].append(new[3])
             result["content"].append(new[0])
             result["task_id"].append(new[4])
+            result["label"].append(new[1])
     return result
 
 @app.route('/searchById',methods = ["POST"])
@@ -102,14 +106,16 @@ def id():
         }
         return result
 
+
 @app.route('/upateTaskTable',methods = ["POST"])
 def upateTaskTable():
     id = request.values['id']
     name = request.values['name']
+    tags = request.values['tags']
     description = request.values['description']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        result = db_helper.UpdateTaskTable(id,name,description)
+        result = db_helper.UpdateTaskTable(id,name,tags,description)
         return result
 
 @app.route('/deleteTaskData',methods = ["POST"])
@@ -129,6 +135,14 @@ def insertTaskData():
         result = db_helper.InsertToTaskTable(name,description)
         return result
 
+@app.route('/labelReportTable',methods = ["POST"])
+def labelReportTable():
+    id = request.values['id']
+    tags = request.values['tags']
+    db_setting = DBSetting()
+    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+        result = db_helper.LabelReportTable(id,tags)
+        return result
 
 if __name__ == '__main__':
     app.run(debug=True)

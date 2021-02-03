@@ -9,10 +9,11 @@ if __name__ == '__main__':
     data = data_helper.getCleanCSVData()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
         print("db method")
-        db_helper.TruncateTable("report")
-        db_helper.TruncateTable("task")
-        db_helper.InserCSVData(data, len(data))
+        # db_helper.TruncateTable("report")
+        # db_helper.TruncateTable("task")
+        # db_helper.InserCSVData(data, len(data))
         db_helper.InitTaskTable()
+        # db_helper.CreatTaskTable("task")
 
         # db_helper.InitTaskTable()
         # print(db_helper.InsertToTaskTable("task5","This is task 5"))
@@ -31,7 +32,7 @@ if __name__ == '__main__':
         # print(db_helper.SelectDataById("report", 99))
         # db_helper.TruncateTable("report")
 
-        # db_helper.DropTable("report")
+        # db_helper.DropTable("task")
         # db_helper.CreatTable("report")
 
         # db_helper.CreateDocTable("documents")

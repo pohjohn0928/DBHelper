@@ -22,7 +22,11 @@
         var global_id=0;
         url = window.location.href;
         taskNum = url.split("?")[1];
-        console.log(taskNum);
+        tags = url.split("?")[2];
+        tagsLen = tags.split(',').length;
+        tags = tags.split(',');
+        console.log(tags);
+        console.log(tagsLen);
 
         var aj = $.ajax({
             url : '/searchByTask',
@@ -104,19 +108,44 @@
 
 
         function displayTaskIdNews(news){
-            var content = `<table class="table table-striped"><thead><tr><th>id</th><th>content</th><th>Task Id</th><th>更新</th><th>刪除</th></tr></thead><tbody>`;
+            var content = `<table class="table table-striped"><thead><tr><th>id</th><th>content</th><th>Task Id</th><th>label</th><th>刪除</th><th>更新</th>`;
+            for(var tagLen = 0 ; tagLen < tagsLen ; tagLen++){
+                content += `<th>${tags[tagLen]}</th>`;
+            }
+            content += `</tr></thead><tbody>`;
             var len = news["id"].length;
             for(var i = 0 ; i < len ; i++){
                 content += `<tr>`;
                 content += `<th>${news["id"][i]}</th>`;
                 content += `<td>${news["content"][i]}</td>`;
                 content += `<td>${news["task_id"][i]}</td>`;
+                content += `<td>${news["label"][i]}</td>`
                 content += `<td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"][i]}">delete</button></td>`;
                 content += `<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"][i]})">更新資料</button></td>`;
+                for(var tagLen = 0 ; tagLen < tagsLen ; tagLen++){
+                    content += `<td><button class="btn btn-primary" data-toggle="modal" onclick="updateTag(${news["id"][i]},'${tags[tagLen]}')">${tags[tagLen]}</button></td>`;
+                }
                 content += `</tr>`;
             }
             content += `</tbody></table>`;
             document.getElementById("showInfo").innerHTML = content;
+        }
+
+        function updateTag(id,tag){
+            var check =  confirm(`Are you sure to label id${id} with label : ${tag}`);
+            console.log(id,tag);
+            if(check){
+                var aj = $.ajax({
+                    url : '/labelReportTable',
+                    data :
+                    {
+                        id : id,
+                        tags : tag
+                    },
+                    type : 'post',
+                    success : function (result) { alert(result); }
+                })
+            }
         }
 
         function setGlobalId(id){
@@ -214,7 +243,6 @@
                     </div>
                 </div>
             </div>
-
 
             <div class="row" class="btn btn-primary">
                 <div id="showInfo"></div>

@@ -69,6 +69,11 @@ class DBHelper:
             counter += 1
         return data_text
 
+    def LabelReportTable(self,id,label):
+        sql = f"UPDATE report set label = '{label}' where id = '{id}'"
+        self.cursor.execute(sql)
+        return f"Update id {id} with tag {label}"
+
     def SelectDataById(self, tableName, id):
         sql = f"select * from {tableName} where id={id}"
         self.cursor.execute(sql)
@@ -139,7 +144,7 @@ class DBHelper:
             if table[0] == tableName:
                 table_exist = 1
         if table_exist == 0:
-            sql = f"CREATE TABLE {tableName}(id int AUTO_INCREMENT,name varchar(100),description varchar(20000),create_time varchar(100),Update_time varchar(100),PRIMARY KEY (id));"
+            sql = f"CREATE TABLE {tableName}(id int AUTO_INCREMENT,name varchar(100),tags varchar(100),description varchar(20000),create_time varchar(100),Update_time varchar(100),PRIMARY KEY (id));"
             self.cursor.execute(sql)
         else:
             logging.error(f"Table Name '{tableName}' already exist")
@@ -164,12 +169,12 @@ class DBHelper:
         self.cursor.execute(sql)
         return "Finish Insert"
 
-    def UpdateTaskTable(self,id:int,name,description):
+    def UpdateTaskTable(self,id:int,name,tags,description):
         now = datetime.now()
         current_time = now.strftime("%d/%m/%Y %H:%M:%S")
-        sql = f"UPDATE task set name = '{name}', description = '{description}', Update_time ='{current_time}' where id = '{id}'"
+        sql = f"UPDATE task set name = '{name}',tags = '{tags}', description = '{description}', Update_time ='{current_time}' where id = '{id}'"
         self.cursor.execute(sql)
-        return f"id : {id} is updated name : '{name}' and description : '{description}'"
+        return f"id : {id} is updated name : '{name}' , tags = {tags} and description : '{description}'"
 
     def DeleteTaskData(self,id: int):
         checkSql = f"select * from task where id={id}"
