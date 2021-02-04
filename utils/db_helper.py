@@ -153,7 +153,7 @@ class DBHelper:
         sql = "SELECT * FROM report GROUP BY taskId HAVING count(*)>1"
         self.cursor.execute(sql)
         for data in self.cursor.fetchall():
-            self.InsertToTaskTable(f"task{data[4]}",f"This is task{data[4]}")
+            self.InsertToTaskTable(f"task{data[4]}","",f"This is task{data[4]}")
         return "Finish Initialize"
 
     def GetTaskTableInfo(self):
@@ -162,10 +162,10 @@ class DBHelper:
         data = self.cursor.fetchall()
         return data
 
-    def InsertToTaskTable(self,name,description):
+    def InsertToTaskTable(self,name,tags,description):
         now = datetime.now()
         current_time = now.strftime("%d/%m/%Y %H:%M:%S")
-        sql = f"INSERT INTO task (name,description,create_time,Update_time) VALUES('{name}','{description}','{current_time}','{current_time}')"
+        sql = f"INSERT INTO task (name,tags,description,create_time,Update_time) VALUES('{name}','{tags}','{description}','{current_time}','{current_time}')"
         self.cursor.execute(sql)
         return "Finish Insert"
 
@@ -186,6 +186,19 @@ class DBHelper:
         else:
             return f"{id} dose not exist yet"
 
+    def ShowLabelNumber(self,taskId):
+        sql = f"SELECT * FROM report where taskId={taskId}"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        labelDic = {}
+
+        for new in data:
+            if new[1] in labelDic.keys():
+                labelDic[f"{new[1]}"] += 1
+            else:
+                labelDic[f"{new[1]}"] = 1
+
+        return labelDic
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):

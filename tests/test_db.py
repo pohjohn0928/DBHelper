@@ -12,8 +12,9 @@ if __name__ == '__main__':
         # db_helper.TruncateTable("report")
         # db_helper.TruncateTable("task")
         # db_helper.InserCSVData(data, len(data))
-        db_helper.InitTaskTable()
+        # db_helper.InitTaskTable()
         # db_helper.CreatTaskTable("task")
+        # print(db_helper.ShowLabelNumber(1))
 
         # db_helper.InitTaskTable()
         # print(db_helper.InsertToTaskTable("task5","This is task 5"))

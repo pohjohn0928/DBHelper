@@ -1,4 +1,4 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <title>{{title}}</title>
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -40,6 +40,28 @@
             }
          })
 
+        var showLabelNum = $.ajax({
+            url : '/showLabelNum',
+            data : {
+                task : taskNum,
+            },
+            type : 'post',
+            success : function (result) {
+                displayLabelNum(result);
+            }
+         })
+
+        function displayLabelNum(labels){
+            console.log(labels);
+            labels["empty"] = labels[""];
+            delete labels[""];
+            content = ``;
+            for(label in labels){
+                content += `${label}:${labels[label]}   `;
+            }
+            console.log(content);
+            document.getElementById("displayLabelNum").innerHTML = content;
+        }
 
 
 
@@ -120,7 +142,7 @@
                 content += `<td>${news["content"][i]}</td>`;
                 content += `<td>${news["task_id"][i]}</td>`;
                 content += `<td>${news["label"][i]}</td>`
-                content += `<td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"][i]}">delete</button></td>`;
+                content += `<td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i});setTimeout(location.reload.bind(location), 1000);" value="${news["id"][i]}">delete</button></td>`;
                 content += `<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"][i]})">更新資料</button></td>`;
                 for(var tagLen = 0 ; tagLen < tagsLen ; tagLen++){
                     content += `<td><button class="btn btn-primary" data-toggle="modal" onclick="updateTag(${news["id"][i]},'${tags[tagLen]}')">${tags[tagLen]}</button></td>`;
@@ -175,11 +197,13 @@
             var i = 0;
             content =  `<table class="table table-striped">`;
             content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td><td>Update</td>`;
-            content += `<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i})" value="${news["id"]}">delete</button></td>`;
+            content += `<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i});setTimeout(location.reload.bind(location), 1000);" value="${news["id"]}">delete</button></td>`;
             content += `<td><button type="button" class="btn btn-primary get_id" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"]})">更新資料</button></td>`;
             content += `</table>`;
             document.getElementById("showInfo").innerHTML = content;
         }
+
+
 
 </script>
 <body>
@@ -199,6 +223,7 @@
             <!--        modal-->
             <div class="container">
                 <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#insert">新增資料</button>
+                <p><div id="displayLabelNum"></div></p>
                 <div class="modal fade" id="insert" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -215,7 +240,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" onclick="InsertFunc()">submit</button>
+                                <button type="submit" class="btn btn-primary" onclick="InsertFunc();setTimeout(location.reload.bind(location), 1000);">submit</button>
                             </div>
                         </div>
                     </div>
@@ -237,7 +262,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" onclick="UpdateFunc()">submit</button>
+                                <button type="submit" class="btn btn-primary" onclick="UpdateFunc();setTimeout(location.reload.bind(location), 1000);">submit</button>
                             </div>
                         </div>
                     </div>

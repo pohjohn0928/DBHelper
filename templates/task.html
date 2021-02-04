@@ -47,7 +47,7 @@
             content += `<td>${data["create_time"][i]}</td>`;
             content += `<td>${data["Update_time"][i]}</td>`;
             content += `<td><button class="btn btn-success" data-toggle="modal" data-target="#update" onclick="setGlobalId(${data["id"][i]})">Update</button></td>`;
-            content += `<td><button class="btn btn-danger delete_btn btn-sm deleteBtn${i}" onclick="DeleteTaskData(${i})" value="${data["id"][i]}">Delete</button></td>`;
+            content += `<td><button class="btn btn-danger delete_btn btn-sm deleteBtn${i}" onclick="DeleteTaskData(${i}) ;setTimeout(location.reload.bind(location), 1000);" value="${data["id"][i]}">Delete</button></td>`;
             content += `</tr>`;
         }
         content += `</tbody></table>`;
@@ -102,6 +102,7 @@
             data :
             {
                 name : $('#InserName').val(),
+                tag : $('#InserTag').val(),
                 description : $('#InsertDes').val()
             },
             type : 'post',
@@ -129,15 +130,19 @@
                             <textarea class="form-control" rows="3" id="InserName"></textarea>
                         </div>
                         <div class="form-group">
+                            <label for="InserTag">tag :</label>
+                            <textarea class="form-control" rows="3" id="InserTag" placeholder="Please seperate each tag with ','"></textarea>
+                        </div>
+                        <div class="form-group">
                             <label for="InsertDes">description :</label>
-                            <input type="text" id="InsertDes"/>
+                            <textarea class="form-control" rows="3" id="InsertDes"></textarea>
                         </div>
                     </form>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" onclick="insertTaskTable()">submit</button>
+                    <button type="submit" class="btn btn-primary" onclick="insertTaskTable();setTimeout(location.reload.bind(location), 1000);">submit</button>
                 </div>
             </div>
         </div>
@@ -159,7 +164,7 @@
                         </div>
                         <div class="form-group">
                             <label for="UpateTag">tags :</label>
-                            <textarea class="form-control" rows="3" id="UpateTag"></textarea>
+                            <textarea class="form-control" rows="3" id="UpateTag" placeholder="Please seperate each tag with ','"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="UpateDes">description :</label>
@@ -170,7 +175,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" onclick="updateTaskTable()">submit</button>
+                    <button type="submit" class="btn btn-primary" onclick="updateTaskTable();setTimeout(location.reload.bind(location), 1000);">submit</button>
                 </div>
             </div>
         </div>

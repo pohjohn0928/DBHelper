@@ -129,10 +129,11 @@ def deleteTaskData():
 @app.route('/insertTaskData',methods = ["POST"])
 def insertTaskData():
     name = request.values['name']
+    tags = request.values['tag']
     description = request.values['description']
     db_setting = DBSetting()
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        result = db_helper.InsertToTaskTable(name,description)
+        result = db_helper.InsertToTaskTable(name,tags,description)
         return result
 
 @app.route('/labelReportTable',methods = ["POST"])
@@ -143,6 +144,14 @@ def labelReportTable():
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
         result = db_helper.LabelReportTable(id,tags)
         return result
+
+@app.route('/showLabelNum',methods = ["POST"])
+def showLabelNum():
+    taskNum = request.values['task']
+    db_setting = DBSetting()
+    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+        result = db_helper.ShowLabelNumber(taskNum)
+    return result
 
 if __name__ == '__main__':
     app.run(debug=True)
