@@ -33,8 +33,13 @@ class DBHelper:
             sql = f"INSERT INTO report VALUES('{data[i]}','','','{i + 1}','{int(i / 200) + 1}')"
             self.cursor.execute(sql)
 
-    def InsertData(self, str, taskId: int):
-        sql = f"INSERT INTO report (content,label,other,taskId) VALUES('{str}','','','{taskId}')"
+    def InsertData(self, str,label, taskId: int):
+        sql = f"INSERT INTO report (content,label,other,taskId) VALUES('{str}','{label}','','{taskId}')"
+        self.cursor.execute(sql)
+        return f"{str} is inserted to report with task id : {taskId}"
+
+    def ReadCSVFileToDB(self,str,label, taskId: int):
+        sql = f"INSERT INTO report (content,label,other,taskId) VALUES('{str}','{label}','','{taskId}')"
         self.cursor.execute(sql)
         return f"{str} is inserted to report with task id : {taskId}"
 
@@ -144,16 +149,16 @@ class DBHelper:
             if table[0] == tableName:
                 table_exist = 1
         if table_exist == 0:
-            sql = f"CREATE TABLE {tableName}(id int AUTO_INCREMENT,name varchar(100),tags varchar(100),description varchar(20000),create_time varchar(100),Update_time varchar(100),PRIMARY KEY (id));"
+            sql = f"CREATE TABLE {tableName}(id int AUTO_INCREMENT,name varchar(100),tags varchar(100),description varchar(10000),create_time varchar(100),Update_time varchar(100),PRIMARY KEY (id));"
             self.cursor.execute(sql)
         else:
             logging.error(f"Table Name '{tableName}' already exist")
 
     def InitTaskTable(self):
-        sql = "SELECT * FROM report GROUP BY taskId HAVING count(*)>1"
+        sql = "SELECT taskId FROM report GROUP BY taskId HAVING count(*)>1"
         self.cursor.execute(sql)
         for data in self.cursor.fetchall():
-            self.InsertToTaskTable(f"task{data[4]}","",f"This is task{data[4]}")
+            self.InsertToTaskTable(f"task{data[0]}","",f"This is task{data[0]}")
         return "Finish Initialize"
 
     def GetTaskTableInfo(self):
