@@ -261,16 +261,18 @@
 
         function toCsv(table){
             const rows = table.querySelectorAll('tr');
-            return [].slice.call(rows)
-                .map(function(row) {
-                    const cells = row.querySelectorAll('th,td');
-                    return [].slice.call(cells)
-                        .map(function(cell) {
-                            return cell.textContent;
-                        })
-                        .join(',');
-                })
-                .join('\n');
+            var csv = [];
+            var row = [];
+            for (var i = 0; i < rows.length; i++) {
+                row = [];
+                cols = rows[i].querySelectorAll("td, th");
+                for (var j = 0; j < 4; j++){
+                    row.push(cols[j].innerText.replaceAll("\n",""));
+                }
+                csv.push(row.join(","));
+            }
+            csv = csv.join("\n");
+            return csv
         }
 
         function download(text, fileName){
