@@ -1,14 +1,15 @@
 from sklearn import svm
-from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from xgboost import XGBClassifier
 import jieba
 import joblib
+import numpy as np
 
 class ModelHelper:
     def getImdbData(self):
-        path = "C:\\Users\\taisiangbo\\Desktop\\sentimentalDataset.txt"
+        path = "..\\sentimentalDataset.txt"
         f = open(path,encoding='utf-8',mode="r")
         words = f.read()
         words = words.split("\n")
@@ -22,32 +23,35 @@ class ModelHelper:
                 if label == "負面":
                     content = word[:-3]
                     negtive += 1
-                    content = jieba.lcut(content)
-                    content = ''.join(content)
+                    content = np.array(jieba.lcut(content))
+                    content = " ".join(content)
                     contents.append(content)
                     labels.append(label)
                 if label == "正面":
                     positive += 1
                     content = word[:-3]
-                    content = jieba.lcut(content)
-                    content = ''.join(content)
+                    content = np.array(jieba.lcut(content))
+                    content = " ".join(content)
                     contents.append(content)
                     labels.append(label)
             except:
                 continue
+        print(f"positive data : {positive}筆")
+        print(f"negative data : {negtive}筆")
         f.close()
-        return contents,labels
+        return np.array(contents),np.array(labels)
 
     def stopwordslist(self):
-        filepath = "C:\\Users\\taisiangbo\\Desktop\\text.txt"
+        filepath = "C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\text.txt"
         stopwords = [line.strip() for line in open(filepath, 'r', encoding='utf-8').readlines()]
         return stopwords
 
     def tainingDataWithSVM(self,content,label):
         x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1,shuffle=True)
-        vectorizer = TfidfVectorizer(stop_words=self.stopwordslist())
+        vectorizer = TfidfVectorizer(max_features=5000,min_df=2,stop_words=self.stopwordslist())
         x_train_features = vectorizer.fit_transform(x_train)
         x_test_features = vectorizer.transform(x_test)
+
         SVCModel = svm.SVC(kernel='linear')
         SVCModel.fit(x_train_features, y_train)
         prediction_linear = SVCModel.predict(x_test_features)
@@ -58,7 +62,7 @@ class ModelHelper:
 
     def tainingDataWithXgboost(self,content,label):
         x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1, shuffle=True)
-        vectorizer = TfidfVectorizer(stop_words=self.stopwordslist())
+        vectorizer = TfidfVectorizer(max_features=5000, min_df=2,stop_words=self.stopwordslist())
         x_train_features = vectorizer.fit_transform(x_train)
         x_test_features = vectorizer.transform(x_test)
 
@@ -71,6 +75,8 @@ class ModelHelper:
         joblib.dump(vectorizer, 'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizerXgboost.pkl')
 
     def predictBySVM(self,str):
+        str = jieba.lcut(str)
+        str = " ".join(str)
         str = [str]
         vectorizer = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizeSVM.pkl")
         str = vectorizer.transform(str)
@@ -78,6 +84,8 @@ class ModelHelper:
         return SVCModel.predict(str)
 
     def predictByXgboost(self,str):
+        str = jieba.lcut(str)
+        str = " ".join(str)
         str = [str]
         vectorizer = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizerXgboost.pkl")
         str = vectorizer.transform(str)

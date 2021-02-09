@@ -3,7 +3,7 @@ import jieba
 
 if __name__ == '__main__':
     modelHelper = ModelHelper()
-    # content,label = modelHelper.getImdbData()
+    content,label = modelHelper.getImdbData()
     # modelHelper.tainingDataWithSVM(content,label)
     # modelHelper.tainingDataWithXgboost(content,label)
-    modelHelper.predictByXgboost("很好")
+    # print(modelHelper.predictBySVM("難過"))
