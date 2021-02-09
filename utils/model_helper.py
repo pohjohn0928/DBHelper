@@ -1,49 +1,86 @@
-import csv
-import numpy as np
 from sklearn import svm
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from xgboost import XGBClassifier
+import jieba
+import joblib
 
 class ModelHelper:
     def getImdbData(self):
-        path = "C:\\Users\\taisiangbo\Downloads\\archive\\IMDB_Dataset.csv"
-        content = []
-        label = []
-        f = open(path, encoding='utf-8')
-        negative = 0
+        path = "C:\\Users\\taisiangbo\\Desktop\\sentimentalDataset.txt"
+        f = open(path,encoding='utf-8',mode="r")
+        words = f.read()
+        words = words.split("\n")
+        contents = []
+        labels = []
+        negtive = 0
         positive = 0
-        rows = csv.reader(f)
-        counter = 0
-        for row in rows:
-            row[0] = row[0].replace("<br />", "")
-            content.append(row[0])
-            label.append(row[1])
-            if row[1]=='positive':
-                positive += 1
-            if row[1] == 'negative':
-                negative += 1
+        for word in words:
+            try:
+                label = word[-2] + word[-1]
+                if label == "負面":
+                    content = word[:-3]
+                    negtive += 1
+                    content = jieba.lcut(content)
+                    content = ''.join(content)
+                    contents.append(content)
+                    labels.append(label)
+                if label == "正面":
+                    positive += 1
+                    content = word[:-3]
+                    content = jieba.lcut(content)
+                    content = ''.join(content)
+                    contents.append(content)
+                    labels.append(label)
+            except:
+                continue
+        f.close()
+        return contents,labels
 
-            counter += 1
-            if counter > 2000:
-                break
-        print(f"positive review : {positive}")
-        print(f"negative review : {negative}")
-        del content[0]
-        del label[0]
-        content = np.array(content)
-        label = np.array(label)
-        return content,label
+    def stopwordslist(self):
+        filepath = "C:\\Users\\taisiangbo\\Desktop\\text.txt"
+        stopwords = [line.strip() for line in open(filepath, 'r', encoding='utf-8').readlines()]
+        return stopwords
 
     def tainingDataWithSVM(self,content,label):
         x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1,shuffle=True)
-        vectorizer = TfidfVectorizer(max_features=5000,min_df=5,max_df=0.8)
+        vectorizer = TfidfVectorizer(stop_words=self.stopwordslist())
+        x_train_features = vectorizer.fit_transform(x_train)
+        x_test_features = vectorizer.transform(x_test)
+        SVCModel = svm.SVC(kernel='linear')
+        SVCModel.fit(x_train_features, y_train)
+        prediction_linear = SVCModel.predict(x_test_features)
+        report = classification_report(y_test, prediction_linear, output_dict=True)
+        print(f"SVM report : {report}")
+        joblib.dump(SVCModel, 'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\svmModel.pkl')
+        joblib.dump(vectorizer,'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizeSVM.pkl')
+
+    def tainingDataWithXgboost(self,content,label):
+        x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1, shuffle=True)
+        vectorizer = TfidfVectorizer(stop_words=self.stopwordslist())
         x_train_features = vectorizer.fit_transform(x_train)
         x_test_features = vectorizer.transform(x_test)
 
-        classifier_linear = svm.SVC(kernel='linear')
-        classifier_linear.fit(x_train_features, y_train)
-        prediction_linear = classifier_linear.predict(x_test_features)
+        xgboostModel = XGBClassifier(n_estimators=100,learning_rate=0.1)
+        xgboostModel.fit(x_train_features,y_train)
+        predicted = xgboostModel.predict(x_test_features)
+        report = classification_report(y_test,predicted,output_dict=True)
+        print(f"Xgboost report {report}")
+        joblib.dump(xgboostModel,'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\xgboostModel.pkl')
+        joblib.dump(vectorizer, 'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizerXgboost.pkl')
 
-        report = classification_report(y_test, prediction_linear, output_dict=True)
-        print(report)
+    def predictBySVM(self,str):
+        str = [str]
+        vectorizer = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizeSVM.pkl")
+        str = vectorizer.transform(str)
+        SVCModel = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\svmModel.pkl")
+        return SVCModel.predict(str)
+
+    def predictByXgboost(self,str):
+        str = [str]
+        vectorizer = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizerXgboost.pkl")
+        str = vectorizer.transform(str)
+        xgboostModel = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\xgboostModel.pkl")
+        return xgboostModel.predict(str)
+

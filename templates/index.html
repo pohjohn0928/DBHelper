@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
 </head>
 <style>
         input{
@@ -21,7 +22,7 @@
 
 
 </style>
-<script>
+<script charset="UTF-8">
         var global_id=0;
         url = window.location.href;
         taskNum = url.split("?")[1];
@@ -198,8 +199,8 @@
         function displayIdNews(news){
             var i = 0;
             content =  `<table class="table table-striped">`;
-            content += `<tr></tr><td>Id</td><td>Content</td><td>Task Id</td><td>Delete</td><td>Update</td>`;
-            content += `<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i});setTimeout(location.reload.bind(location), 1000);" value="${news["id"]}">delete</button></td>`;
+            content += `<tr></tr><td>Id</td><td>Content</td><td>label</td><td>Task Id</td><td>Delete</td><td>Update</td>`;
+            content += `<tr></tr><td>${news["id"]}</td><td>${news["content"]}</td><td>${news["label"]}</td><td>${news["task_id"]}</td><td><button class="deleteBtn${i} btn btn-primary" onclick="DeleteFunc(${i});setTimeout(location.reload.bind(location), 1000);" value="${news["id"]}">delete</button></td>`;
             content += `<td><button type="button" class="btn btn-primary get_id" data-toggle="modal" data-target="#update" onclick="setGlobalId(${news["id"]})">更新資料</button></td>`;
             content += `</table>`;
             document.getElementById("showInfo").innerHTML = content;
@@ -285,6 +286,30 @@
             document.body.removeChild(link);
         }
 
+        function autoLabelSVM(){
+            var aj = $.ajax({
+                url : '/autoLabelSVM',
+                data :
+                {
+                    taskId : taskNum
+                },
+                type : 'post',
+                success : function (result) { alert("finish") }
+             })
+        }
+
+        function autoLabelXgboost(){
+            var aj = $.ajax({
+                url : '/autoLabelXgboost',
+                data :
+                {
+                    taskId : taskNum
+                },
+                type : 'post',
+                success : function (result) { alert("finish") }
+             })
+        }
+
 
 </script>
 <body>
@@ -321,6 +346,8 @@
             <div class="container">
                 <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#insert">新增資料
                 </button>
+                <button type="button" class="btn btn-info btn-lg" onclick="autoLabelSVM();setTimeout(location.reload.bind(location), 8000);">Auto Label Article(SVM)</button>
+                <button type="button" class="btn btn-info btn-lg" onclick="autoLabelXgboost();setTimeout(location.reload.bind(location), 8000);">Auto Label Article(Xgboost)</button>
                 <p>
                 <div id="displayLabelNum"></div>
                 </p>

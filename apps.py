@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 from utils.db_helper import DBHelper
+from utils.model_helper import ModelHelper
 from config import DBSetting
-import re
 app = Flask(__name__)
 
 
@@ -123,9 +123,11 @@ def id():
     if news == ():
         return "false"
     else:
+        print(news)
         result = {
             "id": news[0][3],
             "content": news[0][0],
+            "label" : news[0][1],
             "task_id": news[0][4]
         }
         return result
@@ -181,6 +183,27 @@ def showLabelNum():
         result = db_helper.ShowLabelNumber(taskNum)
     return result
 
+@app.route('/autoLabelSVM', methods=["POST"])
+def autoLabel():
+    taskNum = request.values['taskId']
+    db_setting = DBSetting()
+    model_helper = ModelHelper()
+    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+        datas = db_helper.SelectDataByTask("report",taskNum)
+        for data in datas:
+            db_helper.LabelReportTable(data[3],model_helper.predictBySVM(data[0])[0])
+        return "finish"
+
+@app.route('/autoLabelXgboost', methods=["POST"])
+def autoLabelXgboost():
+    taskNum = request.values['taskId']
+    db_setting = DBSetting()
+    model_helper = ModelHelper()
+    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+        datas = db_helper.SelectDataByTask("report",taskNum)
+        for data in datas:
+            db_helper.LabelReportTable(data[3],model_helper.predictBySVM(data[0])[0])
+        return "finish"
 
 if __name__ == '__main__':
     app.run(debug=True)
