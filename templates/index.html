@@ -206,27 +206,31 @@
         function insertFile(){
             var selectedFile = document.getElementById('inputFile').files[0];
             var reader = new FileReader();
-            reader.readAsText(selectedFile,'gbk');
+            reader.readAsText(selectedFile,'Big5');
+            console.log(selectedFile)
             reader.onload = function (e) {
                 content = [];
                 label = [];
                 data = e.target.result;
+                data = data.replaceAll("\r","");
+
                 data = data.replaceAll("\n",",");
                 data = data.replaceAll(" ","");
+                data = data.replaceAll("\"","");
                 data = data.split(',');
-                emptyCharIndex = data.indexOf("");
-                data.splice(emptyCharIndex, 1);
-                console.log(data);
+
                 for(i = 2 ; i < data.length ; i++){
                     if(i % 2 == 0){
+                        if(data[i] == ""){
+                            break;
+                        }
                         content.push(data[i]);
                     }
-                    else{
+                    if(i % 2 == 1){
                         label.push(data[i]);
                     }
                 }
-                console.log(content);
-                console.log(label);
+
                 console.log(taskNum);
 
                 content = JSON.stringify(content);
@@ -325,7 +329,7 @@
                 <div class="form-group">
                     <label for="inputFile">inputFile: </label>
                     <input type="file" id="inputFile"/>
-                    <button type="submit" class="btn btn-primary" onclick="insertFile();setTimeout(location.reload.bind(location), 1000);">submit</button>
+                    <button type="submit" class="btn btn-primary" onclick="insertFile();">submit</button>
                 </div>
             </div>
 

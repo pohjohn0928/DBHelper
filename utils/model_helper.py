@@ -6,10 +6,15 @@ from xgboost import XGBClassifier
 import jieba
 import joblib
 import numpy as np
+import os
+import abc
 
-class ModelHelper:
+class init(abc.ABC):
+    dirname = os.path.dirname(__file__)
+
+class ModelHelper(init):
     def getImdbData(self):
-        path = "..\\sentimentalDataset.txt"
+        path = os.path.join(self.dirname,'..\\sentimentalDataset.txt')
         f = open(path,encoding='utf-8',mode="r")
         words = f.read()
         words = words.split("\n")
@@ -42,8 +47,8 @@ class ModelHelper:
         return np.array(contents),np.array(labels)
 
     def stopwordslist(self):
-        filepath = "C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\text.txt"
-        stopwords = [line.strip() for line in open(filepath, 'r', encoding='utf-8').readlines()]
+        path = os.path.join(self.dirname,'..\\text.txt')
+        stopwords = [line.strip() for line in open(path, 'r', encoding='utf-8').readlines()]
         return stopwords
 
     def tainingDataWithSVM(self,content,label):
@@ -57,8 +62,11 @@ class ModelHelper:
         prediction_linear = SVCModel.predict(x_test_features)
         report = classification_report(y_test, prediction_linear, output_dict=True)
         print(f"SVM report : {report}")
-        joblib.dump(SVCModel, 'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\svmModel.pkl')
-        joblib.dump(vectorizer,'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizeSVM.pkl')
+
+        self.SVCModelPath = os.path.join(self.dirname,'..\\models\\svmModel.pkl')
+        self.vectorizerSVMPath = os.path.join(self.dirname,'..\\models\\vectorizeSVM.pkl')
+        joblib.dump(SVCModel, self.SVCModelPath)
+        joblib.dump(vectorizer,self.vectorizerPath)
 
     def tainingDataWithXgboost(self,content,label):
         x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1, shuffle=True)
@@ -71,8 +79,11 @@ class ModelHelper:
         predicted = xgboostModel.predict(x_test_features)
         report = classification_report(y_test,predicted,output_dict=True)
         print(f"Xgboost report {report}")
-        joblib.dump(xgboostModel,'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\xgboostModel.pkl')
-        joblib.dump(vectorizer, 'C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\vectorizerXgboost.pkl')
+
+        self.xgboostModelPath = os.path.join(self.dirname,'..\\models\\xgboostModel.pkl')
+        self.vectorizerXgboostPath = os.path.join(self.dirname,'..\\models\\vectorizerXgboost.pkl')
+        joblib.dump(xgboostModel,self.xgboostModelPath)
+        joblib.dump(vectorizer, self.vectorizerXgboostPath)
 
     def predictBySVM(self,str):
         str = jieba.lcut(str)

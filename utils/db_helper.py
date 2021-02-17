@@ -205,6 +205,11 @@ class DBHelper:
 
         return labelDic
 
+    def getCovidData(self):
+        sql = "select content from ts_page_content where 1"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        return data
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()

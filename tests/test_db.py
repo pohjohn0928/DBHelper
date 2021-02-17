@@ -3,6 +3,7 @@ from utils.data_helper import DataHelper
 from config import DBSetting
 from datetime import datetime
 
+
 if __name__ == '__main__':
     db_setting = DBSetting()
     data_helper = DataHelper()
@@ -13,9 +14,12 @@ if __name__ == '__main__':
         # db_helper.TruncateTable("task")
         # db_helper.InserCSVData(data, len(data))
         # db_helper.InitTaskTable()
-        # db_helper.CreatTaskTable("task")
-        # print(db_helper.ShowLabelNumber(1))
+        #
+        # row_data = db_helper.getCovidData()
+        # key_word = '武漢肺炎'
+        # data_helper.dataToCSV(row_data,key_word)
 
+        # db_helper.CreatTaskTable("task")
         # db_helper.InitTaskTable()
         # print(db_helper.InsertToTaskTable("task5","This is task 5"))
         # print(db_helper.UpdateTaskTable(1,"task1","This is task 1"))

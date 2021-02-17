@@ -202,7 +202,7 @@ def autoLabelXgboost():
     with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
         datas = db_helper.SelectDataByTask("report",taskNum)
         for data in datas:
-            db_helper.LabelReportTable(data[3],model_helper.predictBySVM(data[0])[0])
+            db_helper.LabelReportTable(data[3],model_helper.predictByXgboost(data[0])[0])
         return "finish"
 
 if __name__ == '__main__':
