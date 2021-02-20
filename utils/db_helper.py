@@ -205,7 +205,7 @@ class DBHelper:
 
         return labelDic
 
-    def getCovidData(self):
+    def getKeyWordData(self):
         sql = "select content from ts_page_content where 1"
         self.cursor.execute(sql)
         data = self.cursor.fetchall()

@@ -2,6 +2,8 @@ from flask import Flask, request, render_template
 from utils.db_helper import DBHelper
 from utils.model_helper import ModelHelper
 from config import DBSetting
+import os
+from utils.data_helper import DataHelper
 app = Flask(__name__)
 
 
@@ -204,6 +206,18 @@ def autoLabelXgboost():
         for data in datas:
             db_helper.LabelReportTable(data[3],model_helper.predictByXgboost(data[0])[0])
         return "finish"
+
+@app.route('/keywordSelect', methods=["POST"])
+def keywordSelect():
+    keyword = request.values['keyword']
+    db_setting = DBSetting()
+    data_helper = DataHelper()
+
+    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+        row_data = db_helper.getKeyWordData()
+        data_helper.dataToCSV(row_data, keyword)
+        dirname = os.path.dirname(__file__)
+        return f"The path of the CSV file is {dirname}"
 
 if __name__ == '__main__':
     app.run(debug=True)

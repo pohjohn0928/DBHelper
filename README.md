@@ -5,3 +5,6 @@
 - Finish Task Page
 - show each label time
 - Refresh page after click
+
+
+# FAQ

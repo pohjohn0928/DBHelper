@@ -5,7 +5,6 @@ from sklearn.metrics import classification_report
 from xgboost import XGBClassifier
 import jieba
 import joblib
-import numpy as np
 import os
 import abc
 
@@ -13,39 +12,6 @@ class init(abc.ABC):
     dirname = os.path.dirname(__file__)
 
 class ModelHelper(init):
-    def getImdbData(self):
-        path = os.path.join(self.dirname,'..\\sentimentalDataset.txt')
-        f = open(path,encoding='utf-8',mode="r")
-        words = f.read()
-        words = words.split("\n")
-        contents = []
-        labels = []
-        negtive = 0
-        positive = 0
-        for word in words:
-            try:
-                label = word[-2] + word[-1]
-                if label == "負面":
-                    content = word[:-3]
-                    negtive += 1
-                    content = np.array(jieba.lcut(content))
-                    content = " ".join(content)
-                    contents.append(content)
-                    labels.append(label)
-                if label == "正面":
-                    positive += 1
-                    content = word[:-3]
-                    content = np.array(jieba.lcut(content))
-                    content = " ".join(content)
-                    contents.append(content)
-                    labels.append(label)
-            except:
-                continue
-        print(f"positive data : {positive}筆")
-        print(f"negative data : {negtive}筆")
-        f.close()
-        return np.array(contents),np.array(labels)
-
     def stopwordslist(self):
         path = os.path.join(self.dirname,'..\\text.txt')
         stopwords = [line.strip() for line in open(path, 'r', encoding='utf-8').readlines()]
@@ -66,7 +32,7 @@ class ModelHelper(init):
         self.SVCModelPath = os.path.join(self.dirname,'..\\models\\svmModel.pkl')
         self.vectorizerSVMPath = os.path.join(self.dirname,'..\\models\\vectorizeSVM.pkl')
         joblib.dump(SVCModel, self.SVCModelPath)
-        joblib.dump(vectorizer,self.vectorizerPath)
+        joblib.dump(vectorizer,self.vectorizerSVMPath)
 
     def tainingDataWithXgboost(self,content,label):
         x_train, x_test, y_train, y_test = train_test_split(content, label, test_size=0.2, random_state=1, shuffle=True)

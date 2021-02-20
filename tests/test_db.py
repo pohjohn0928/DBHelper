@@ -14,10 +14,10 @@ if __name__ == '__main__':
         # db_helper.TruncateTable("task")
         # db_helper.InserCSVData(data, len(data))
         # db_helper.InitTaskTable()
-        #
-        # row_data = db_helper.getCovidData()
-        # key_word = '武漢肺炎'
-        # data_helper.dataToCSV(row_data,key_word)
+
+        row_data = db_helper.getKeyWordData()
+        key_word = '新冠'
+        data_helper.dataToCSV(row_data,key_word)
 
         # db_helper.CreatTaskTable("task")
         # db_helper.InitTaskTable()

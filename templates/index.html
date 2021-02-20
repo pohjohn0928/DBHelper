@@ -154,20 +154,20 @@
         }
 
         function updateTag(id,tag){
-            var check =  confirm(`Are you sure to label id${id} with label : ${tag}`);
-            console.log(id,tag);
-            if(check){
-                var aj = $.ajax({
-                    url : '/labelReportTable',
-                    data :
-                    {
-                        id : id,
-                        tags : tag
-                    },
-                    type : 'post',
-                    success : function (result) { alert(result); }
-                })
-            }
+<!--            var check =  confirm(`Are you sure to label id${id} with label : ${tag}`);-->
+<!--            console.log(id,tag);-->
+<!--            if(check){-->
+            var aj = $.ajax({
+                url : '/labelReportTable',
+                data :
+                {
+                    id : id,
+                    tags : tag
+                },
+                type : 'post',
+                success : function (result) { alert(result); }
+            })
+<!--            }-->
         }
 
         function setGlobalId(id){
@@ -218,21 +218,16 @@
                 data = data.replaceAll(" ","");
                 data = data.replaceAll("\"","");
                 data = data.split(',');
-
-                for(i = 2 ; i < data.length ; i++){
-                    if(i % 2 == 0){
-                        if(data[i] == ""){
-                            break;
-                        }
+                for(i = 5 ; i < data.length ; i++){
+                    if(i % 4 == 1){
                         content.push(data[i]);
                     }
-                    if(i % 2 == 1){
+                    if(i % 4 == 3){
                         label.push(data[i]);
                     }
                 }
-
                 console.log(taskNum);
-
+                console.log(label);
                 content = JSON.stringify(content);
                 label = JSON.stringify(label);
 
@@ -276,6 +271,7 @@
             csv = csv.join("\n");
             return csv
         }
+
 
         function download(text, fileName){
             const link = document.createElement('a');
