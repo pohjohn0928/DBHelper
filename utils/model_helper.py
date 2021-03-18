@@ -1,12 +1,24 @@
 from sklearn import svm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report,accuracy_score   #,accuracy_score
+from sklearn.datasets import make_multilabel_classification
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
 from xgboost import XGBClassifier
 import jieba
 import joblib
 import os
 import abc
+import numpy as np
+import pickle
+
+# from keras.models import Sequential
+# from keras.layers import Dense
+# import keras
+from sklearn.ensemble import RandomForestClassifier
 
 class init(abc.ABC):
     dirname = os.path.dirname(__file__)
@@ -69,3 +81,64 @@ class ModelHelper(init):
         xgboostModel = joblib.load("C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\models\\xgboostModel.pkl")
         return xgboostModel.predict(str)
 
+    def trainingMultiLabel(self,fact,accus):
+        x_train, x_test, y_train, y_test = train_test_split(fact, accus, test_size=0.2, random_state=1, shuffle=True)
+        vectorizer = TfidfVectorizer(stop_words='english',max_features=5000,min_df=2)
+        x_train_features = vectorizer.fit_transform(x_train)
+        x_test_features = vectorizer.transform(x_test)
+
+        # fit
+        classifier = RandomForestClassifier(random_state=1)
+        # classifier = KNeighborsClassifier()
+        # classifier = svm.SVC(kernel='linear')
+        # classifier = XGBClassifier()
+
+        multi_target_model = OneVsRestClassifier(classifier)
+        model = multi_target_model.fit(x_train_features, y_train)
+        predicted = model.predict(x_test_features)
+        prob = model.predict_proba(x_test_features)
+        for i in range(len(predicted)):
+            print(predicted[i],prob[i])
+
+        # for i in range(len(predicted)):
+        #     print(y_test[i],predicted[i])
+        print(f"accuracy_score : {accuracy_score(y_test, predicted)}")
+        # eval
+        right = 0
+        wrong = 0
+        for i in range(len(y_test)):
+            for j in range(len(y_test[i])):
+                if y_test[i][j] == predicted[i][j]:
+                    right += 1
+                else:
+                    wrong += 1
+
+        print(right / (right + wrong))
+
+        # save
+        pickle.dump(vectorizer,open("../vectorizer.pkl","wb"))
+        pickle.dump(model,open("../model.pkl","wb"))
+
+    def predictMultiLabel(self,fact):
+        vectorizer = pickle.load(open("../vectorizer.pkl","rb"))
+        model= pickle.load(open("../model.pkl","rb"))
+        fact = jieba.lcut(fact)
+        fact = " ".join(fact)
+        fact = [fact]
+        fact = vectorizer.transform(fact)
+        results = model.predict(fact)
+        prob = model.predict_proba(fact)
+
+        print(results)
+        print(prob)
+        # accus_list = ["危險駕駛","故意傷害","妨礙公務","其他"]
+        # accus = []
+        # for result in results:
+        #     in_range = 0
+        #     for i in range(len(result)):
+        #         if result[i] == 1:
+        #             accus.append(accus_list[i])
+        #             in_range = 1
+        #     if in_range == 0:
+        #         accus.append(accus_list[-1])
+        # return accus

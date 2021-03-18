@@ -4,6 +4,8 @@ import os
 import numpy as np
 import abc
 import jieba
+import json
+from opencc import OpenCC
 
 class init(abc.ABC):
     dirname = os.path.dirname(__file__)
@@ -104,3 +106,64 @@ class DataHelper(init):
         print(f"negative data : {negative}筆")
         f.close()
         return np.array(contents), np.array(labels)
+
+
+    def getMultipleLabelsData(self):
+        file = open("C:\\Users\\taisiangbo\\Downloads\\CAIL2018_ALL_DATA\\final_all_data\\exercise_contest\\data_train.json","r",encoding='utf-8')
+        cc = OpenCC('s2hk')
+
+        fact = []
+        accus = []
+        limit = 150
+        dan_drive = 0   # [1,0,0]
+        harm = 0        # [0,1,0]
+        off_duty = 0    # [0,0,1]
+        dri_harm = 0    # [1,1,0]
+        dri_off = 0     # [1,0,1]
+        harm_off = 0    # [0,1,1]
+        others = 0      # [0,0,0]
+        for line in file.readlines():
+            if [harm,dri_harm,off_duty,dri_off,harm_off,dri_harm,others] == [limit] * 7:
+                break
+            dic = json.loads(line)
+            labels = dic["meta"]["accusation"]
+            label = ",".join(labels)
+            label = cc.convert(label)
+
+            content = dic["fact"]
+            if label == '故意傷害' and harm < limit:
+                harm += 1
+                fact.append(content)
+                accus.append([0,1,0])
+            elif label == '危險駕駛' and dan_drive < limit:
+                dan_drive += 1
+                fact.append(content)
+                accus.append([1,0,0])
+            elif label == '妨害公務' and off_duty < limit:
+                off_duty += 1
+                fact.append(content)
+                accus.append([0,0,1])
+            elif label == '危險駕駛,故意傷害' and dri_harm < limit:
+                dri_harm += 1
+                fact.append(content)
+                accus.append([1,1,0])
+            elif label == '故意傷害,妨害公務' and harm_off < limit:
+                harm_off += 1
+                fact.append(content)
+                accus.append([0,1,1])
+            elif label == '危險駕駛,妨害公務' and dri_off < limit:
+                dri_off += 1
+                fact.append(content)
+                accus.append([1,0,1])
+            elif others < limit:
+                others += 1
+                fact.append(content)
+                accus.append([0,0,0])
+
+        for i in range(len(fact)):
+            content = cc.convert(fact[i])
+            content = jieba.lcut(content)
+            content = " ".join(content)
+            fact[i] = content
+        return fact,accus
+

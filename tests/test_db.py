@@ -2,7 +2,7 @@ from utils.db_helper import DBHelper
 from utils.data_helper import DataHelper
 from config import DBSetting
 from datetime import datetime
-
+from utils.travel_food_data_helper import GetData,GetDataFromMongo
 
 if __name__ == '__main__':
     db_setting = DBSetting()
@@ -15,9 +15,9 @@ if __name__ == '__main__':
         # db_helper.InserCSVData(data, len(data))
         # db_helper.InitTaskTable()
 
-        row_data = db_helper.getKeyWordData()
-        key_word = '新冠'
-        data_helper.dataToCSV(row_data,key_word)
+        # row_data = db_helper.getKeyWordData()
+        # key_word = '新冠'
+        # data_helper.dataToCSV(row_data,key_word)
 
         # db_helper.CreatTaskTable("task")
         # db_helper.InitTaskTable()
@@ -43,3 +43,8 @@ if __name__ == '__main__':
         # db_helper.CreateDocTable("documents")
         # db_helper.TruncateTable("documents")
         # db_helper.InsertCSVDataToDoc(data,len(data))
+
+        # get_data = GetData()
+        # get_data.outPutCsvFile()
+        getDataFromMongo = GetDataFromMongo()
+        getDataFromMongo.getData()

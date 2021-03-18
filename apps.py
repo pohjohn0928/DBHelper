@@ -61,18 +61,19 @@ def insert():
 
 @app.route('/ReadCSVFileToDB', methods=["POST"])
 def ReadCSVFileToDB():
-    content = request.values["content"]
-    label = request.values["label"]
-    taskId = request.values['taskId']
-    db_setting = DBSetting()
-    content = content.replace("[","").replace("]","").replace("\"","")
-    content = content.split(",")
-    label = label.replace("\\","").replace("[","").replace("]","").replace("\"","").replace("r","")
-    label = label.split(",")
-    with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
-        for i in range(len(content)):
-            db_helper.ReadCSVFileToDB(content[i],label[i],taskId)
-        return "Finish Insert CSV"
+    content = request.files.getlist('file')
+    print(content)
+    # label = request.values["label"]
+    # taskId = request.values['taskId']
+    # db_setting = DBSetting()
+    # content = content.replace("[","").replace("]","").replace("\"","")
+    # content = content.split(",")
+    # label = label.replace("\\","").replace("[","").replace("]","").replace("\"","").replace("r","")
+    # label = label.split(",")
+    # with DBHelper(db_setting.host, db_setting.user, db_setting.password, db_setting.db) as db_helper:
+    #     for i in range(len(content)):
+    #         db_helper.ReadCSVFileToDB(content[i],label[i],taskId)
+    return "Finish Insert CSV"
 
 
 

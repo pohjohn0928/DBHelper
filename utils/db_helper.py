@@ -11,6 +11,8 @@ class DBHelper:
         DATE_FORMAT = '%Y%m%d %H:%M:%S'
         logging.basicConfig(level=logging.DEBUG, format=FORMAT, datefmt=DATE_FORMAT, filename='C:\\Users\\taisiangbo\\Desktop\\python\\dbHelper\\log\\db.log', filemode='a')
 
+
+
     def __enter__(self):
         sql = "show databases"
         self.cursor.execute(sql)
